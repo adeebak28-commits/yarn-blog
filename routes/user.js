@@ -1,21 +1,20 @@
 const {Router} = require("express")
 const multer = require('multer')
-const path = require('path')
+const cloudinary = require("../services/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const User = require ("../models/user")
 const {signupUserSchema,signinUserSchema} = require('../validators/auth-validator')
 
 const router = Router();
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.resolve(`./public/uploads/`))
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: "yarnblog/profile-images",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
     },
-    filename: function (req, file, cb) {
-        const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`
-        cb(null, fileName);
-    },
-})
+});
 
 const upload = multer({
     storage,
@@ -49,7 +48,7 @@ router.post('/signup', upload.single('profileImage'), async (req,res)=>{
     try {
         const userData = { fullName, email, password };
         if (req.file) {
-            userData.profileImageURL = `uploads/${req.file.filename}`;
+            userData.profileImageURL = req.file.path;
         }
         await User.create(userData);
         return res.redirect("/user/signin");

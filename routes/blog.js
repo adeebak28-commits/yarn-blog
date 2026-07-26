@@ -1,21 +1,20 @@
 const {Router} = require("express")
 const multer = require('multer')
-const path = require('path')
+const cloudinary = require("../services/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const Blog = require("../models/blog");
 const Comment = require("../models/comment");
 
 const router = Router();
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve(`./public/uploads/`))
-  },
-  filename: function (req, file, cb) {
-    const fileName = `${Date.now()}-${file.originalname}`
-    cb(null,fileName);
-  },
-})
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: "yarnblog/blogs",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    },
+});
 
 const upload = multer({
     storage,
@@ -43,7 +42,7 @@ router.post('/', requireAuth, upload.single('coverImage'), async(req,res)=>{
         const blog = await Blog.create({
             body, title,
             createdBy: req.user._id,
-            coverImageURL: req.file ? `uploads/${req.file.filename}` : undefined
+            coverImageURL: req.file ? req.file.path : undefined
         });
         return res.redirect(`/blog/${blog._id}`);
     } catch (error) {
