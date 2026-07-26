@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('./partials/head') %>
+        <title>Home Page</title>
+
+        <style>
+            .text-truncate-multiline {
+                overflow: hidden;
+
+                display: -webkit-box;
+                display: box;
+
+                line-clamp: 3;
+                -webkit-line-clamp: 3;
+
+                -webkit-box-orient: vertical;
+
+                height: 72px;
+                line-height: 1.5rem;
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <%- include('./partials/nav') %>
+
+        <div class="container mt-4">
+    <div class="row">
+
+        <% blogs.forEach(blog => { %>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+
+                <div class="card h-100 shadow-sm">
+
+                    <img
+                        src="/<%= blog.coverImageURL %>"
+                        class="card-img-top"
+                        style="height:180px; object-fit:cover;"
+                    >
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="card-title">
+                            <%= blog.title %>
+                        </h5>
+
+                        <p class="card-text text-truncate-multiline">
+                            <%= blog.body %>
+                        </p>
+
+                        <a href="/blog/<%= blog._id %>"
+                           class="btn btn-primary mt-auto">
+                            View
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        <% }) %>
+
+    </div>
+</div>
+
+        <%- include('./partials/scripts') %>
+    
+    </body>
+</html>
